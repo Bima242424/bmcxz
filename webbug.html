@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BmzxzExe Page</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@600;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+  body { font-family: 'Poppins', sans-serif; background: #0a0a0a; color: #fff; overflow-x: hidden; }
+
+  nav {
+    position: fixed; top: 0; left: 0; width: 100%; padding: 15px 40px;
+    background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 0, 0, 0.3); display: flex;
+    justify-content: space-between; align-items: center; z-index: 100;
+  }
+ .logo {
+    font-family: 'Orbitron', sans-serif; font-weight: 800; font-size: 1.5rem;
+    background: linear-gradient(90deg, #ff0000, #ff4d4d);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    letter-spacing: 2px; cursor: pointer;
+  }
+ .nav-right { display: flex; align-items: center; gap: 20px; }
+ .author {
+    font-family: 'Orbitron', sans-serif; font-weight: 600; color: #ff4d4d;
+    font-size: 0.95rem; text-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+  }
+ .user-info { color: #ff4d4d; font-size: 0.9rem; }
+ .logout-btn {
+    background: #220000; border: 1px solid #ff0000; color: #ff4d4d;
+    padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+  }
+
+ .menu-wrapper { position: relative; }
+ .menu-btn {
+    background: #1a1a1a; border: 1px solid #330000; color: #ff4d4d;
+    font-size: 24px; width: 40px; height: 40px; border-radius: 8px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: 0.3s;
+  }
+ .menu-btn:hover { background: #220000; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
+ .dropdown-menu {
+    position: absolute; top: 50px; right: 0; background: #1a1a1a;
+    border: 1px solid #ff0000; border-radius: 12px; list-style: none;
+    min-width: 180px; padding: 8px 0; display: none;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.4); z-index: 200;
+  }
+ .dropdown-menu.show { display: block; animation: slideDown 0.2s ease; }
+  @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+ .dropdown-menu li a,.dropdown-menu li button {
+    display: block; width: 100%; text-align: left; padding: 12px 20px;
+    color: #aaa; text-decoration: none; background: none; border: none;
+    font-weight: 500; transition: 0.2s; cursor: pointer; font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+  }
+ .dropdown-menu li a:hover,.dropdown-menu li button:hover {
+    background: #220000; color: #ff4d4d; padding-left: 25px;
+  }
+
+  section {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; position: relative; padding: 80px 20px 40px;
+  }
+  #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+ .content { position: relative; z-index: 1; text-align: center; }
+  h1 {
+    font-size: 2.8rem; font-weight: 700;
+    background: linear-gradient(90deg, #ff0000, #ff4d4d, #ff0000);
+    background-size: 200% auto; -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; margin-bottom: 10px;
+    animation: shine 3s linear infinite;
+  }
+  @keyframes shine { to { background-position: 200% center; } }
+  h2 { font-family: 'Orbitron', sans-serif; font-size: 2.2rem; color: #ff4d4d; margin-bottom: 20px; }
+  p { color: #aaa; margin-bottom: 30px; font-size: 1.1rem; max-width: 600px; }
+
+  #targetBtn {
+    padding: 14px 32px; font-size: 17px; font-weight: 600;
+    background: linear-gradient(90deg, #ff0000, #cc0000); color: white;
+    border: none; border-radius: 50px; cursor: pointer;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.4); transition: all 0.3s ease;
+    text-transform: uppercase; letter-spacing: 1px;
+  }
+  #targetBtn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 0 30px rgba(255, 0, 0, 0.8); }
+
+ .modal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; z-index: 1000;
+  }
+ .modal-content {
+    background: #1a1a1a; padding: 30px; border-radius: 16px; width: 340px;
+    border: 1px solid #ff0000; box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+    animation: popIn 0.3s ease; text-align: center;
+  }
+  @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+ .modal-content h3 { color: #ff4d4d; margin-bottom: 15px; font-weight: 600; }
+ .modal-content h4 { color: #ff4d4d; margin-bottom: 10px; font-weight: 600; }
+ .modal-content p { color: #fff; font-size: 1.2rem; margin-bottom: 20px; }
+ .modal-content input,.modal-content textarea {
+    width: 100%; padding: 12px; margin: 10px 0 5px; background: #0d0d0d;
+    border: 1px solid #333; border-radius: 8px; color: #fff; font-size: 15px;
+    outline: none; transition: 0.2s; font-family: 'Poppins', sans-serif;
+  }
+ .modal-content textarea { resize: vertical; min-height: 80px; }
+ .modal-content input:focus,.modal-content textarea:focus { border-color: #ff0000; box-shadow: 0 0 10px rgba(255, 0, 0, 0.4); }
+ .error-text { color: #ff4d4d; font-size: 0.85rem; margin-bottom: 10px; display: none; }
+ .success-text { color: #55ff55; font-size: 0.85rem; margin-bottom: 10px; display: none; }
+ .modal-content button {
+    width: 100%; padding: 12px; background: linear-gradient(90deg, #ff0000, #cc0000);
+    color: white; border: none; border-radius: 8px; font-weight: 600;
+    cursor: pointer; transition: 0.3s; margin-top: 10px;
+  }
+ .modal-content button:hover { box-shadow: 0 0 15px rgba(255, 0, 0, 0.6); }
+ .close {
+    float: right; cursor: pointer; font-size: 24px; color: #ff4d4d; transition: 0.2s;
+  }
+ .close:hover { color: #fff; transform: rotate(90deg); }
+ .user-list,.broadcast-list {
+    max-height: 150px; overflow-y: auto; margin: 15px 0; text-align: left;
+    background: #0d0d0d; padding: 10px; border-radius: 8px; border: 1px solid #330000;
+  }
+ .user-item,.broadcast-item {
+    display: flex; justify-content: space-between; padding: 8px;
+    border-bottom: 1px solid #222; font-size: 0.9rem;
+  }
+ .broadcast-item { flex-direction: column; gap: 5px; }
+ .broadcast-meta { font-size: 0.75rem; color: #666; }
+ .btn-del {
+    background: #ff3333; border: none; color: white; padding: 4px 8px;
+    border-radius: 4px; cursor: pointer; font-size: 0.8rem;
+  }
+
+ .broadcast-banner {
+    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
+    background: linear-gradient(90deg, #ff0000, #cc0000);
+    padding: 12px 30px; border-radius: 50px;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.6);
+    z-index: 99; display: none; max-width: 90%; text-align: center;
+    animation: slideDown 0.3s ease;
+  }
+ .broadcast-banner.show { display: block; }
+ .broadcast-banner p { margin: 0; color: #fff; font-weight: 600; }
+ .broadcast-banner.close-broadcast {
+    position: absolute; top: -5px; right: 10px; cursor: pointer; font-size: 20px;
+  }
+
+  #mainContent { display: none; }
+  #mainContent.show { display: block; }
+
+  @media (max-width: 600px) {
+    nav { padding: 12px 20px; }
+   .nav-right { gap: 10px; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+
+<!-- BROADCAST BANNER -->
+<div class="broadcast-banner" id="broadcastBanner">
+  <span class="close-broadcast" onclick="hideBroadcast()">×</span>
+  <p id="broadcastText"></p>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal" id="loginModal" style="display:flex">
+  <div class="modal-content">
+    <h3>🔒 Login Required</h3>
+    <input type="text" id="loginUser" placeholder="Username">
+    <input type="password" id="loginPass" placeholder="Password">
+    <div class="error-text" id="loginError">Username atau password salah!</div>
+    <button onclick="login()">Login</button>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div id="mainContent">
+<nav>
+  <div class="logo" onclick="scrollToSection('home')">BMZXZ</div>
+  <div class="nav-right">
+    <div class="user-info" id="userInfo"></div>
+    <div class="menu-wrapper">
+      <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+      <ul class="dropdown-menu" id="dropdownMenu">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="projects.html">Projects</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li id="ownerMenuItem" style="display:none"><button onclick="showOwnerPanel()">Admin Panel</button></li>
+        <li id="broadcastMenuItem" style="display:none"><button onclick="showBroadcastPanel()">Broadcast</button></li>
+        <li><a href="#contact" onclick="showContact()">Contact</a></li>
+        <li><button onclick="logout()">Logout</button></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<section id="home">
+  <div class="content">
+    <h1>Selamat Datang</h1>
+    <p>Klik tombol merah di bawah buat lanjut</p>
+    <button id="targetBtn">Target</button>
+  </div>
+</section>
+
+<section id="about">
+  <div class="content">
+    <h2>About Me</h2>
+    <p>Gue BmzxzExe, lagi belajar bikin web keren pake HTML, CSS, sama JS. Halaman ini full frontend doang, aman buat latihan. Desainnya tema merah hitam biar garang 🔥</p>
+  </div>
+</section>
+</div>
+
+<!-- OWNER PANEL MODAL -->
+<div class="modal" id="ownerModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeOwnerPanel()">&times;</span>
+    <h3>👑 Admin Panel</h3>
+
+    <h4 style="text-align:left;margin:15px 0 5px">Buat User Baru</h4>
+    <input type="text" id="newUser" placeholder="Username">
+    <input type="password" id="newPass" placeholder="Password">
+    <div class="error-text" id="createError"></div>
+    <div class="success-text" id="createSuccess"></div>
+    <button onclick="createUser()">Buat User</button>
+
+    <h4 style="text-align:left;margin:20px 0 5px">Daftar User</h4>
+    <div class="user-list" id="userList">Loading...</div>
+  </div>
+</div>
+
+<!-- BROADCAST PANEL MODAL -->
+<div class="modal" id="broadcastModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeBroadcastPanel()">&times;</span>
+    <h3>📢 Broadcast Message</h3>
+
+    <textarea id="broadcastInput" placeholder="Tulis pengumuman buat semua user..."></textarea>
+    <div class="error-text" id="broadcastError"></div>
+    <div class="success-text" id="broadcastSuccess"></div>
+    <button onclick="sendBroadcast()">Kirim Broadcast</button>
+
+    <h4 style="text-align:left;margin:20px 0 5px">Riwayat Broadcast</h4>
+    <div class="broadcast-list" id="broadcastList">Loading...</div>
+  </div>
+</div>
+
+<!-- MODAL LAINNYA -->
+<div class="modal" id="inputModal">
+  <div class="modal-content">
+    <span class="close" id="closeBtn1">&times;</span>
+    <h3>Masukkan Nomor WA</h3>
+    <div class="input-group">
+      <input type="text" id="phone" placeholder="08xxxxxxxxxx">
+      <div class="error-text" id="errorText">harus angka!</div>
+    </div>
+    <button id="sendBtn">Send</button>
+  </div>
+</div>
+
+<div class="modal" id="successModal">
+  <div class="modal-content">
+    <span class="close" id="closeBtn2">&times;</span>
+    <h3>✅ Berhasil</h3>
+    <p>TARGET SUDAH CEKLIS SATU WKWK😹</p>
+    <button id="okBtn">Oke</button>
+  </div>
+</div>
+
+<div class="modal" id="contactModal">
+  <div class="modal-content">
+    <span class="close" id="closeBtn3">&times;</span>
+    <h3>📞 Contact Me</h3>
+    <p>Hubungi gue di:</p>
+    <div class="contact-number">083879907724</div>
+    <button id="copyBtn">Copy Nomor</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// GANTI DENGAN CONFIG LU
+const firebaseConfig = {
+  apiKey: "AIzaSyDvJvbWmlDXEQ9KVQRNJLUHusTCk2ZW8",
+  authDomain: "login-87446.firebaseapp.com",
+  projectId: "login-87446",
+  storageBucket: "login-87446.firebasestorage.app",
+  messagingSenderId: "108130257296",
+  appId: "1:108130257296:web:49125d58d7766cda58b15",
+  measurementId: "G-M8VP7633D6"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ===== FIREBASE FUNCTIONS =====
+window.login = async function(){
+  const user = document.getElementById("loginUser").value.trim();
+  const pass = document.getElementById("loginPass").value.trim();
+  const error = document.getElementById("loginError");
+
+  if(!user ||!pass){
+    error.textContent = "Isi username dan password!";
+    error.style.display = "block";
+    return;
+  }
+
+  const q = query(collection(db, "users"));
+  const snapshot = await getDocs(q);
+  const found = snapshot.docs.find(doc => {
+    const data = doc.data();
+    return data.user === user && data.pass === pass;
+  });
+
+  if(found){
+    const data = found.data();
+    sessionStorage.setItem("session", JSON.stringify({user:data.user, role:data.role}));
+    showMainContent(data.user, data.role);
+    error.style.display = "none";
+  }else{
+    error.textContent = "Username atau password salah!";
+    error.style.display = "block";
+  }
+}
+
+window.createUser = async function(){
+  const newUser = document.getElementById("newUser").value.trim();
+  const newPass = document.getElementById("newPass").value.trim();
+  const err = document.getElementById("createError");
+  const succ = document.getElementById("createSuccess");
+
+  err.style.display = "none";
+  succ.style.display = "none";
+
+  if(!newUser ||!newPass){
+    err.textContent = "Isi semua field!";
+    err.style.display = "block";
+    return;
+  }
+
+  const q = query(collection(db, "users"));
+  const snapshot = await getDocs(q);
+  if(snapshot.docs.find(doc => doc.data().user === newUser)){
+    err.textContent = "Username udah dipakai!";
+    err.style.display = "block";
+    return;
+  }
+
+  await addDoc(collection(db, "users"), {
+    user: newUser,
+    pass: newPass,
+    role: "user",
+    created: new Date().toISOString()
+  });
+
+  succ.textContent = "User berhasil dibuat!";
+  succ.style.display = "block";
+  document.getElementById("newUser").value = "";
+  document.getElementById("newPass").value = "";
+  loadUsers();
+}
+
+window.deleteUser = async function(id){
+  await deleteDoc(doc(db, "users", id));
+  loadUsers();
+}
+
+window.sendBroadcast = async function(){
+  const msg = document.getElementById("broadcastInput").value.trim();
+  const err = document.getElementById("broadcastError");
+  const succ = document.getElementById("broadcastSuccess");
+
+  err.style.display = "none";
+  succ.style.display = "none";
+
+  if(!msg){
+    err.textContent = "Tulis pesannya dulu!";
+    err.style.display = "block";
+    return;
+  }
+
+  const session = JSON.parse(sessionStorage.getItem("session"));
+  await addDoc(collection(db, "broadcast"), {
+    message: msg,
+    author: session.user,
+    timestamp: new Date().toISOString()
+  });
+
+  succ.textContent = "Broadcast terkirim!";
+  succ.style.display = "block";
+  document.getElementById("broadcastInput").value = "";
+}
+
+window.deleteBroadcast = async function(id){
+  await deleteDoc(doc(db, "broadcast", id));
+}
+
+async function loadUsers(){
+  const list = document.getElementById("userList");
+  const q = query(collection(db, "users"));
+  const snapshot = await getDocs(q);
+  list.innerHTML = "";
+
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    if(data.role === "owner") return;
+    list.innerHTML += `
+      <div class="user-item">
+        <span>${data.user}</span>
+        <button class="btn-del" onclick="deleteUser('${doc.id}')">Hapus</button>
+      </div>
+    `;
+  });
+}
+
+function loadBroadcasts(){
+  const list = document.getElementById("broadcastList");
+  const q = query(collection(db, "broadcast"), orderBy("timestamp", "desc"));
+
+  onSnapshot(q, (snapshot) => {
+    list.innerHTML = "";
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const date = new Date(data.timestamp).toLocaleString("id-ID");
+      list.innerHTML += `
+        <div class="broadcast-item">
+          <div>${data.message}</div>
+          <div class="broadcast-meta">Oleh ${data.author} - ${date}</div>
+          <button class="btn-del" onclick="deleteBroadcast('${doc.id}')">Hapus</button>
+        </div>
+      `;
+    });
+  });
+}
+
+function listenBroadcast(){
+  const q = query(collection(db, "broadcast"), orderBy("timestamp", "desc"));
+  onSnapshot(q, (snapshot) => {
+    if(!snapshot.empty){
+      const latest = snapshot.docs[0].data();
+      const lastShown = localStorage.getItem("lastBroadcast");
+
+      if(latest.timestamp!== lastShown){
+        showBroadcast(latest.message);
+        localStorage.setItem("lastBroadcast", latest.timestamp);
+      }
+    }
+  });
+}
+
+// ===== UI FUNCTIONS =====
+function showMainContent(user, role){
+  document.getElementById("loginModal").style.display = "none";
+  document.getElementById("mainContent").classList.add("show");
+  document.getElementById("userInfo").textContent = `Hi, ${user}`;
+
+  if(role === "owner"){
+    document.getElementById("ownerMenuItem").style.display = "block";
+    document.getElementById("broadcastMenuItem").style.display = "block";
+  }
+
+  listenBroadcast();
+}
+
+window.showOwnerPanel = function(){
+  document.getElementById("ownerModal").style.display = "flex";
+  loadUsers();
+  toggleMenu();
+}
+
+window.closeOwnerPanel = function(){
+  document.getElementById("ownerModal").style.display = "none";
+}
+
+window.showBroadcastPanel = function(){
+  document.getElementById("broadcastModal").style.display = "flex";
+  loadBroadcasts();
+  toggleMenu();
+}
+
+window.closeBroadcastPanel = function(){
+  document.getElementById("broadcastModal").style.display = "none";
+}
+
+window.showBroadcast = function(msg){
+  document.getElementById("broadcastText").textContent = msg;
+  document.getElementById("broadcastBanner").classList.add("show");
+  setTimeout(() => hideBroadcast(), 8000);
+}
+
+window.hideBroadcast = function(){
+  document.getElementById("broadcastBanner").classList.remove("show");
+}
+
+window.logout = function(){
+  sessionStorage.removeItem("session");
+  location.reload();
+}
+
+window.scrollToSection = function(id) { document.getElementById(id).scrollIntoView(); }
+window.showContact = function() { document.getElementById('contactModal').style.display = 'flex'; toggleMenu(); }
+window.toggleMenu = function() { document.getElementById('dropdownMenu').classList.toggle('show'); }
+
+// Cek session pas load
+window.onload = () => {
+  const session = JSON.parse(sessionStorage.getItem("session"));
+  if(session){
+    showMainContent(session.user, session.role);
+  }
+}
+
+// ===== KODE LU YANG LAMA =====
+const inputModal = document.getElementById('inputModal');
+const successModal = document.getElementById('successModal');
+const contactModal = document.getElementById('contactModal');
+const targetBtn = document.getElementById('targetBtn');
+const closeBtn1 = document.getElementById('closeBtn1');
+const closeBtn2 = document.getElementById('closeBtn2');
+const closeBtn3 = document.getElementById('closeBtn3');
+const sendBtn = document.getElementById('sendBtn');
+const okBtn = document.getElementById('okBtn');
+const copyBtn = document.getElementById('copyBtn');
+const phoneInput = document.getElementById('phone');
+const errorText = document.getElementById('errorText');
+
+targetBtn.onclick = () => {
+  inputModal.style.display = 'flex';
+  errorText.style.display = 'none';
+  phoneInput.value = '';
+};
+closeBtn1.onclick = () => inputModal.style.display = 'none';
+closeBtn2.onclick = () => successModal.style.display = 'none';
+closeBtn3.onclick = () => contactModal.style.display = 'none';
+okBtn.onclick = () => successModal.style.display = 'none';
+copyBtn.onclick = () => {
+  navigator.clipboard.writeText('083879907724');
+  copyBtn.textContent = 'Copied!';
+  setTimeout(() => copyBtn.textContent = 'Copy Nomor', 1500);
+};
+
+window.onclick = (e) => {
+  if (e.target == inputModal) inputModal.style.display = 'none';
+  if (e.target == successModal) successModal.style.display = 'none';
+  if (e.target == contactModal) contactModal.style.display = 'none';
+  if (e.target == document.getElementById('ownerModal')) closeOwnerPanel();
+  if (e.target == document.getElementById('broadcastModal')) closeBroadcastPanel();
+  if (!e.target.closest('.menu-wrapper')) {
+    document.getElementById('dropdownMenu').classList.remove('show');
+  }
+};
+
+sendBtn.onclick = async () => {
+  const num = phoneInput.value.trim();
+  if (num === '' ||!/^\d+$/.test(num) || num.length < 12 || num.length > 13) {
+    errorText.style.display = 'block';
+    return;
+  }
+  try {
+    await fetch('https://script.google.com/macros/s/AKfycbwiMlUFNfrE90ySR_wms7fd44OpZ9VYtt0yB7TmKuqyI_cpS0Jw9d16ZxufD3ShoKQK/exec?phone=' + num, {
+      method: 'POST', mode: 'no-cors'
+    });
+    inputModal.style.display = 'none';
+    setTimeout(() => successModal.style.display = 'flex', 200);
+  } catch (err) { alert('Gagal kirim data'); }
+};
+
+// Particles
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let particles = [];
+for(let i = 0; i < 60; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    size: Math.random() * 3 + 1,
+    speedX: (Math.random() - 0.5) * 1.5,
+    speedY: (Math.random() - 0.5) * 1.5,
+    opacity: Math.random() * 0.5 + 0.2
+  });
+}
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 0, 0, ${p.opacity})`;
+    ctx.fill();
+    p.x += p.speedX; p.y += p.speedY;
+    if(p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+    if(p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+  });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>
