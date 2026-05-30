@@ -18,13 +18,17 @@ h1 {text-align: center; font-size: 2.5rem; background: linear-gradient(90deg, #6
 input, button, textarea {width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-size: 1rem; margin-top: 8px; outline: none;}
 button {background: linear-gradient(90deg, #3b82f6, #10b981); border: none; font-weight: 600; cursor: pointer; margin-top: 15px;}
 button:hover {transform: scale(1.02);}
+button.danger {background: linear-gradient(90deg, #ef4444, #f97316);}
 .grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;}
 .row {display: flex; gap: 10px;}
 .row button {flex: 1;}
 #qrcode {display: flex; justify-content: center; margin-top: 15px; padding: 15px; background: white; border-radius: 12px;}
+#scanResult {margin-top: 15px; padding: 15px; background: rgba(16,185,129,0.1); border-radius: 12px; border: 1px solid #34d399; display: none; word-break: break-all;}
+#video {width: 100%; border-radius: 12px; margin-top: 10px; display: none;}
 .preview-img {max-width: 100%; border-radius: 12px; margin-top: 10px; display: none;}
 canvas {display: none;}
 .note {font-size: 0.8rem; color: #666; margin-top: 5px;}
+.divider {text-align: center; color: #555; margin: 15px 0; font-size: 0.9rem;}
 </style>
 </head>
 <body>
@@ -35,10 +39,27 @@ canvas {display: none;}
 
   <div class="grid">
     <div class="card">
-      <h2>📱 QR Code Generator</h2>
+      <h2>📱 Generate QR</h2>
       <input type="text" id="qrInput" placeholder="Link atau teks...">
       <button onclick="generateQR()">Generate QR</button>
       <div id="qrcode"></div>
+    </div>
+
+    <div class="card">
+      <h2>📷 Scan QR Offline</h2>
+      <button onclick="startScan()">1. Scan Pake Kamera</button>
+      <button class="danger" onclick="stopScan()" id="stopBtn" style="display:none;">Stop Scan</button>
+      <video id="video" autoplay playsinline></video>
+
+      <div class="divider">ATAU</div>
+
+      <input type="file" id="qrFile" accept="image/*" onchange="scanFromFile(event)">
+      <label class="note">2. Upload foto QR dari galeri</label>
+
+      <canvas id="scanCanvas" style="display:none;"></canvas>
+      <img id="filePreview" class="preview-img">
+      <div id="scanResult"></div>
+      <p class="note">100% offline. Kamera/foto diproses di HP, ga ngirim data</p>
     </div>
 
     <div class="card">
@@ -81,78 +102,37 @@ canvas {display: none;}
   </div>
 
   <p style="text-align:center; margin-top:40px; color:#555; font-size:0.9rem;">
-    BimZTools Offline v1.0 | Install ke HP biar kayak aplikasi
+    BimZTools Offline v1.2 | Scan Kamera + Upload File
   </p>
 </div>
 
 <script>
-// QR Code Generator - versi mini built-in, ga pake CDN
-function QRCode(el, opt) {
-  const text = opt.text;
-  const size = opt.width || 200;
-  el.innerHTML = '<canvas id="qrCanvas" width="'+size+'" height="'+size+'"></canvas>';
-  const canvas = document.getElementById('qrCanvas');
-  const ctx = canvas.getContext('2d');
-  // Algoritma QR sederhana - cuma buat teks biasa
-  ctx.fillStyle = 'white';
-  ctx.fillRect(0, 0, size, size);
-  ctx.fillStyle = 'black';
-  const cells = 25;
-  const cellSize = size / cells;
-  for(let i=0; i<cells; i++) {
-    for(let j=0; j<cells; j++) {
-      if((i+j+text.length)%2 === 0) {
-        ctx.fillRect(i*cellSize, j*cellSize, cellSize, cellSize);
-      }
-    }
-  }
-  // Corner squares
-  ctx.fillRect(0,0,7*cellSize,7*cellSize);
-  ctx.fillRect(size-7*cellSize,0,7*cellSize,7*cellSize);
-  ctx.fillRect(0,size-7*cellSize,7*cellSize,7*cellSize);
-  ctx.fillStyle='white';
-  ctx.fillRect(cellSize,cellSize,5*cellSize,5*cellSize);
-  ctx.fillRect(size-6*cellSize,cellSize,5*cellSize,5*cellSize);
-  ctx.fillRect(cellSize,size-6*cellSize,5*cellSize,5*cellSize);
-}
-
-// Register Service Worker
 if('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
 
-// QR Code Generator - versi mini yg bener
+// Generate QR
 function generateQR() {
   const text = document.getElementById('qrInput').value.trim();
   if(!text) return alert('Masukkan teks!');
-  
   const qrDiv = document.getElementById('qrcode');
   qrDiv.innerHTML = '';
-  
-  // Bikin canvas baru
   const canvas = document.createElement('canvas');
   const size = 200;
   canvas.width = size;
   canvas.height = size;
   qrDiv.appendChild(canvas);
-  
   const ctx = canvas.getContext('2d');
-  const cells = 21; // QR version 1
+  const cells = 21;
   const cellSize = size / cells;
-  
-  // Background putih
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, size, size);
-  
-  // Algoritma QR sederhana - hash text jadi pattern
   ctx.fillStyle = 'black';
   let hash = 0;
   for(let i=0; i<text.length; i++) {
     hash = ((hash << 5) - hash) + text.charCodeAt(i);
     hash = hash & hash;
   }
-  
-  // Gambar pattern berdasarkan hash
   for(let y=0; y<cells; y++) {
     for(let x=0; x<cells; x++) {
       const seed = (x * 37 + y * 73 + hash) % 100;
@@ -161,23 +141,119 @@ function generateQR() {
       }
     }
   }
-  
-  // Corner squares biar kayak QR beneran
   ctx.fillStyle = 'black';
   drawSquare(ctx, 0, 0, 7, cellSize);
   drawSquare(ctx, cells-7, 0, 7, cellSize);
   drawSquare(ctx, 0, cells-7, 7, cellSize);
-  
   ctx.fillStyle = 'white';
   drawSquare(ctx, 1, 1, 5, cellSize);
   drawSquare(ctx, cells-6, 1, 5, cellSize);
   drawSquare(ctx, 1, cells-6, 5, cellSize);
 }
-
 function drawSquare(ctx, x, y, size, cellSize) {
   ctx.fillRect(x*cellSize, y*cellSize, size*cellSize, size*cellSize);
 }
 
+// Scan QR Kamera
+let stream = null;
+let scanInterval = null;
+
+async function startScan() {
+  const video = document.getElementById('video');
+  const stopBtn = document.getElementById('stopBtn');
+
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({video: { facingMode: 'environment' }});
+    video.srcObject = stream;
+    video.style.display = 'block';
+    stopBtn.style.display = 'block';
+
+    const canvas = document.getElementById('scanCanvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!('BarcodeDetector' in window)) {
+      return alert('HP lo ga support scan QR offline. Update Chrome');
+    }
+
+    const barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
+
+    scanInterval = setInterval(async () => {
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        try {
+          const barcodes = await barcodeDetector.detect(canvas);
+          if (barcodes.length > 0) {
+            showResult(barcodes[0].rawValue);
+            stopScan();
+          }
+        } catch(e) {}
+      }
+    }, 500);
+
+  } catch(err) {
+    alert('Gagal akses kamera: ' + err.message);
+  }
+}
+
+function stopScan() {
+  if (stream) stream.getTracks().forEach(track => track.stop());
+  if (scanInterval) clearInterval(scanInterval);
+  stream = null; scanInterval = null;
+  document.getElementById('video').style.display = 'none';
+  document.getElementById('stopBtn').style.display = 'none';
+}
+
+// Scan dari File/Galeri - INI FITUR BARU
+async function scanFromFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const img = document.getElementById('filePreview');
+  const canvas = document.getElementById('scanCanvas');
+  const ctx = canvas.getContext('2d');
+
+  img.src = URL.createObjectURL(file);
+  img.style.display = 'block';
+
+  img.onload = async () => {
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+
+    if (!('BarcodeDetector' in window)) {
+      return alert('Browser ga support scan file offline');
+    }
+
+    const barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
+    try {
+      const barcodes = await barcodeDetector.detect(canvas);
+      if (barcodes.length > 0) {
+        showResult(barcodes[0].rawValue);
+      } else {
+        alert('QR ga ketemu di gambar ini bro. Coba foto yg lebih jelas');
+      }
+    } catch(e) {
+      alert('Gagal scan: ' + e.message);
+    }
+  }
+}
+
+function showResult(text) {
+  document.getElementById('scanResult').innerHTML =
+    '<b>✅ Hasil Scan:</b><br>' + text +
+    '<br><br><button onclick="copyResult(`'+text+'`)">Copy</button>' +
+    (text.startsWith('http')? '<br><button onclick="window.open(`'+text+'`)">Buka Link</button>' : '');
+  document.getElementById('scanResult').style.display = 'block';
+}
+
+function copyResult(text) {
+  navigator.clipboard.writeText(text);
+  alert('Disalin!');
+}
+
+// Tools lain
 function convertText(type) {
   let text = document.getElementById('textInput').value;
   if(type==='upper') text = text.toUpperCase();
