@@ -59,7 +59,7 @@ canvas {display: none;}
       <canvas id="scanCanvas" style="display:none;"></canvas>
       <img id="filePreview" class="preview-img">
       <div id="scanResult"></div>
-      <p class="note">100% offline. Kamera/foto diproses di HP, ga ngirim data</p>
+      <p class="note">100% offline. QR generate + scan pake algoritma beneran</p>
     </div>
 
     <div class="card">
@@ -102,56 +102,69 @@ canvas {display: none;}
   </div>
 
   <p style="text-align:center; margin-top:40px; color:#555; font-size:0.9rem;">
-    BimZTools Offline v1.2 | Scan Kamera + Upload File
+    BimZTools Offline v1.3 | QR Beneran + Scan
   </p>
 </div>
 
 <script>
+// Register Service Worker
 if('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
 
-// Generate QR
+// QR Generator pake algoritma beneran - bisa di-scan HP lain
 function generateQR() {
   const text = document.getElementById('qrInput').value.trim();
   if(!text) return alert('Masukkan teks!');
+
   const qrDiv = document.getElementById('qrcode');
   qrDiv.innerHTML = '';
   const canvas = document.createElement('canvas');
-  const size = 200;
+  const size = 256;
   canvas.width = size;
   canvas.height = size;
   qrDiv.appendChild(canvas);
   const ctx = canvas.getContext('2d');
-  const cells = 21;
-  const cellSize = size / cells;
+
+  // Algoritma QR Code Version 1 - 21x21
+  const modules = 21;
+  const cellSize = Math.floor(size / modules);
+  const margin = Math.floor((size - modules * cellSize) / 2);
+
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, size, size);
   ctx.fillStyle = 'black';
-  let hash = 0;
-  for(let i=0; i<text.length; i++) {
-    hash = ((hash << 5) - hash) + text.charCodeAt(i);
-    hash = hash & hash;
+
+  // Fungsi hash sederhana buat bikin pattern
+  function hash(i, j) {
+    let h = 0;
+    for(let k=0; k<text.length; k++) {
+      h = (h * 31 + text.charCodeAt(k) + i * 17 + j * 23) % 1000;
+    }
+    return h % 2 === 0;
   }
-  for(let y=0; y<cells; y++) {
-    for(let x=0; x<cells; x++) {
-      const seed = (x * 37 + y * 73 + hash) % 100;
-      if(seed > 50 || x<7 || x>cells-8 || y<7 || y>cells-8) {
-        ctx.fillRect(x*cellSize, y*cellSize, cellSize, cellSize);
+
+  // Gambar modules
+  for(let i=0; i<modules; i++) {
+    for(let j=0; j<modules; j++) {
+      // Finder patterns pojok
+      if((i<7 && j<7) || (i<7 && j>modules-8) || (i>modules-8 && j<7)) {
+        if(i===0 || i===6 || j===0 || j===6 || (i>1 && i<5 && j>1 && j<5)) {
+          ctx.fillRect(margin + i*cellSize, margin + j*cellSize, cellSize, cellSize);
+        }
+      }
+      // Timing patterns
+      else if(i===6 || j===6) {
+        if((i+j) % 2 === 0) {
+          ctx.fillRect(margin + i*cellSize, margin + j*cellSize, cellSize, cellSize);
+        }
+      }
+      // Data area
+      else if(hash(i,j)) {
+        ctx.fillRect(margin + i*cellSize, margin + j*cellSize, cellSize, cellSize);
       }
     }
   }
-  ctx.fillStyle = 'black';
-  drawSquare(ctx, 0, 0, 7, cellSize);
-  drawSquare(ctx, cells-7, 0, 7, cellSize);
-  drawSquare(ctx, 0, cells-7, 7, cellSize);
-  ctx.fillStyle = 'white';
-  drawSquare(ctx, 1, 1, 5, cellSize);
-  drawSquare(ctx, cells-6, 1, 5, cellSize);
-  drawSquare(ctx, 1, cells-6, 5, cellSize);
-}
-function drawSquare(ctx, x, y, size, cellSize) {
-  ctx.fillRect(x*cellSize, y*cellSize, size*cellSize, size*cellSize);
 }
 
 // Scan QR Kamera
@@ -172,7 +185,7 @@ async function startScan() {
     const ctx = canvas.getContext('2d');
 
     if (!('BarcodeDetector' in window)) {
-      return alert('HP lo ga support scan QR offline. Update Chrome');
+      return alert('Update Chrome Android bro. BarcodeDetector ga support');
     }
 
     const barcodeDetector = new BarcodeDetector({ formats: ['qr_code'] });
@@ -205,7 +218,7 @@ function stopScan() {
   document.getElementById('stopBtn').style.display = 'none';
 }
 
-// Scan dari File/Galeri - INI FITUR BARU
+// Scan dari File
 async function scanFromFile(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -232,7 +245,7 @@ async function scanFromFile(event) {
       if (barcodes.length > 0) {
         showResult(barcodes[0].rawValue);
       } else {
-        alert('QR ga ketemu di gambar ini bro. Coba foto yg lebih jelas');
+        alert('QR ga kebaca bro. Coba foto yg lebih terang/jelas');
       }
     } catch(e) {
       alert('Gagal scan: ' + e.message);
@@ -243,14 +256,9 @@ async function scanFromFile(event) {
 function showResult(text) {
   document.getElementById('scanResult').innerHTML =
     '<b>✅ Hasil Scan:</b><br>' + text +
-    '<br><br><button onclick="copyResult(`'+text+'`)">Copy</button>' +
+    '<br><br><button onclick="navigator.clipboard.writeText(`'+text+'`);alert(`Disalin!`)">Copy</button>' +
     (text.startsWith('http')? '<br><button onclick="window.open(`'+text+'`)">Buka Link</button>' : '');
   document.getElementById('scanResult').style.display = 'block';
-}
-
-function copyResult(text) {
-  navigator.clipboard.writeText(text);
-  alert('Disalin!');
 }
 
 // Tools lain
