@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<title>BimZTools Offline</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link rel="manifest" href="/manifest.json">
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif;}
+body {
+  background: #0a0a0f;
+  color: #e0e0e0;
+  min-height: 100vh;
+  padding: 20px;
+}
+.container {max-width: 1000px; margin: 0 auto;}
+h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+.subtitle {text-align:center; color:#888; margin-bottom:30px;}
+.offline-badge {
+  text-align: center;
+  background: rgba(16,185,129,0.2);
+  color: #34d399;
+  padding: 8px 15px;
+  border-radius: 20px;
+  display: inline-block;
+  margin: 0 auto 30px;
+  border: 1px solid #34d399;
+}
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 25px;
+  margin-bottom: 20px;
+}
+.card h2 {font-size: 1.3rem; margin-bottom: 15px; color: #60a5fa;}
+input, button, textarea {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  margin-top: 8px;
+  outline: none;
+}
+button {
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 15px;
+}
+button:hover {transform: scale(1.02);}
+.grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;}
+.row {display: flex; gap: 10px;}
+.row button {flex: 1;}
+#qrcode {display: flex; justify-content: center; margin-top: 15px; padding: 15px; background: white; border-radius: 12px;}
+.preview-img {max-width: 100%; border-radius: 12px; margin-top: 10px; display: none;}
+canvas {display: none;}
+.note {font-size: 0.8rem; color: #666; margin-top: 5px;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>BimZTools</h1>
+  <p class="subtitle">Versi Offline - Bisa dipake tanpa internet</p>
+  <div style="text-align:center"><span class="offline-badge">📡 Offline Mode Aktif</span></div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>📱 QR Code Generator</h2>
+      <input type="text" id="qrInput" placeholder="Link atau teks...">
+      <button onclick="generateQR()">Generate QR</button>
+      <div id="qrcode"></div>
+    </div>
+
+    <div class="card">
+      <h2>📝 Text Tools</h2>
+      <textarea id="textInput" rows="3" placeholder="Tulis teks..."></textarea>
+      <div class="row">
+        <button onclick="convertText('upper')">UPPER</button>
+        <button onclick="convertText('lower')">lower</button>
+        <button onclick="convertText('title')">Title</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔐 Base64 Encode/Decode</h2>
+      <textarea id="baseInput" rows="3" placeholder="Teks..."></textarea>
+      <div class="row">
+        <button onclick="base64('encode')">Encode</button>
+        <button onclick="base64('decode')">Decode</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔑 Password Generator</h2>
+      <input type="number" id="passLength" value="16" min="4" max="32">
+      <button onclick="genPassword()">Generate Password</button>
+      <input type="text" id="passOutput" readonly>
+    </div>
+
+    <div class="card">
+      <h2>🗜️ Kompres Gambar Offline</h2>
+      <input type="file" id="imgInput" accept="image/*">
+      <input type="range" id="qualityRange" min="10" max="90" value="60">
+      <label style="font-size:0.8rem;">Quality: <span id="qVal">60%</span></label>
+      <button onclick="compressImage()">Kompres Sekarang</button>
+      <img id="previewImg" class="preview-img">
+      <a id="downloadLinkImg" style="display:none;"><button>Download Hasil</button></a>
+      <canvas id="canvas"></canvas>
+      <p class="note">100% offline. Gambar ga dikirim ke server mana2</p>
+    </div>
+
+    <div class="card" style="opacity:0.5">
+      <h2>⬇️ Download MP4/MP3</h2>
+      <p class="note">Butuh internet + server. Pake versi online di tools.html</p>
+    </div>
+  </div>
+
+  <p style="text-align:center; margin-top:40px; color:#555; font-size:0.9rem;">
+    BimZTools Offline v1.0 | Install ke HP biar kayak aplikasi
+  </p>
+</div>
+
+<script>
+// Register Service Worker buat offline
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+
+function generateQR() {
+  const text = document.getElementById('qrInput').value.trim();
+  if(!text) return alert('Masukkan teks!');
+  document.getElementById('qrcode').innerHTML = '';
+  new QRCode(document.getElementById('qrcode'), {text, width: 180, height: 180});
+}
+
+function convertText(type) {
+  let text = document.getElementById('textInput').value;
+  if(type==='upper') text = text.toUpperCase();
+  if(type==='lower') text = text.toLowerCase();
+  if(type==='title') text = text.replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.substr(1).toLowerCase());
+  document.getElementById('textInput').value = text;
+}
+
+function base64(type) {
+  let text = document.getElementById('baseInput').value;
+  try {
+    text = type==='encode'? btoa(unescape(encodeURIComponent(text))) : decodeURIComponent(escape(atob(text)));
+    document.getElementById('baseInput').value = text;
+  } catch(e) {alert('Format Base64 salah!');}
+}
+
+function genPassword() {
+  const len = document.getElementById('passLength').value;
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  let pass = '';
+  for(let i=0; i<len; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+  document.getElementById('passOutput').value = pass;
+}
+
+document.getElementById('qualityRange').oninput = e => document.getElementById('qVal').innerText = e.target.value + '%';
+function compressImage() {
+  const file = document.getElementById('imgInput').files[0];
+  const quality = document.getElementById('qualityRange').value / 100;
+  if(!file) return alert('Pilih gambar dulu!');
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.getElementById('canvas');
+    canvas.width = img.width; canvas.height = img.height;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      document.getElementById('previewImg').src = url;
+      document.getElementById('previewImg').style.display = 'block';
+      document.getElementById('downloadLinkImg').href = url;
+      document.getElementById('downloadLinkImg').download = 'bimztools_compressed.jpg';
+      document.getElementById('downloadLinkImg').style.display = 'block';
+    }, 'image/jpeg', quality);
+  };
+  img.src = URL.createObjectURL(file);
+}
+</script>
+</body>
+</html>
