@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BimZTools - Toolbox Kece</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif;}
+body {
+  background: #0a0a0f;
+  color: #e0e0e0;
+  min-height: 100vh;
+  padding: 20px;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.4) 0%, transparent 50%),
+              radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.4) 0%, transparent 50%),
+              radial-gradient(circle at 40% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%);
+  animation: gradientMove 15s ease infinite;
+  z-index: -1;
+}
+@keyframes gradientMove {0%, 100% {transform: scale(1) rotate(0deg);} 50% {transform: scale(1.1) rotate(5deg);}}
+.container {max-width: 1000px; margin: 0 auto; animation: fadeIn 0.8s;}
+@keyframes fadeIn {from {opacity: 0; transform: translateY(20px);} to {opacity: 1; transform: translateY(0);}}
+
+h1 {
+  text-align: center;
+  font-size: clamp(2.2rem, 6vw, 3.5rem);
+  background: linear-gradient(90deg, #60a5fa, #34d399, #fbbf24);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s ease infinite;
+  margin-bottom: 10px;
+  font-weight: 800;
+}
+@keyframes shimmer {0%, 100% {background-position: 0% 50%;} 50% {background-position: 100% 50%;}}
+
+.subtitle {text-align:center; color:#888; margin-bottom:40px; animation: fadeIn 1s 0.3s both;}
+.card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 25px;
+  margin-bottom: 20px;
+  transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: cardIn 0.6s both;
+}
+.card:hover {
+  border-color: rgba(96, 165, 250, 0.6);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(96, 165, 250, 0.2);
+}
+.card h2 {font-size: 1.3rem; margin-bottom: 15px; color: #60a5fa;}
+
+input, select, button, textarea {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  margin-top: 8px;
+  outline: none;
+  transition: 0.3s;
+}
+input:focus, textarea:focus {border-color: #60a5fa; box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);}
+
+button {
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  background-size: 200% 200%;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 15px;
+  position: relative;
+  overflow: hidden;
+  transition: 0.3s;
+}
+button::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: 0.5s;
+}
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+  background-position: 100% 0;
+}
+button:hover::before {left: 100%;}
+button:active {transform: scale(0.95);}
+
+.grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;}
+.row {display: flex; gap: 10px;}
+.row select,.row button {flex: 1;}
+
+#qrcode {display: flex; justify-content: center; margin-top: 15px; padding: 15px; background: white; border-radius: 12px; animation: pop 0.4s;}
+@keyframes pop {0% {transform: scale(0.8);} 100% {transform: scale(1);}}
+
+.speed-result {font-size: 1.8rem; font-weight: 700; text-align: center; margin-top: 15px; color: #34d399; min-height: 40px;}
+.footer {text-align:center; margin-top:40px; color:#555; font-size:0.9rem;}
+.tag {display:inline-block; padding:4px 10px; background:rgba(96,165,250,0.2); border-radius:20px; font-size:0.8rem; margin-right:5px; animation: float 3s ease-in-out infinite;}
+@keyframes float {0%, 100% {transform: translateY(0);} 50% {transform: translateY(-5px);}}
+.preview-img {max-width: 100%; border-radius: 12px; margin-top: 10px; display: none;}
+canvas {display: none;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>BimZTools</h1>
+  <p class="subtitle">Toolbox internet all-in-one. Backend Vercel = Anti gagal</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>⬇️ Download MP4/MP3</h2>
+      <span class="tag">YT</span><span class="tag">TikTok</span><span class="tag">IG</span><span class="tag">FB</span>
+      <input type="text" id="urlInput" placeholder="Paste link TikTok/YT/IG/FB...">
+      <p style="font-size:0.75rem; color:#666; margin-top:5px;">Auto potong link panjang. Link VT lo udah bisa langsung</p>
+      <div class="row">
+        <select id="formatSelect"><option value="mp4">MP4 Video</option><option value="mp3">MP3 Audio</option></select>
+        <select id="qualitySelect"><option value="720">720p</option><option value="1080">1080p</option><option value="max">Max</option></select>
+      </div>
+      <button onclick="downloadMedia()">Download Sekarang</button>
+    </div>
+
+    <div class="card">
+      <h2>⚡ Speedtest Internet</h2>
+      <button onclick="testSpeed()">Mulai Test</button>
+      <div class="speed-result" id="speedResult">Klik buat mulai</div>
+    </div>
+
+    <div class="card">
+      <h2>📱 QR Code Generator</h2>
+      <input type="text" id="qrInput" placeholder="Link atau teks...">
+      <button onclick="generateQR()">Generate QR</button>
+      <div id="qrcode"></div>
+    </div>
+
+    <div class="card">
+      <h2>📝 Text Tools</h2>
+      <textarea id="textInput" rows="3" placeholder="Tulis teks..."></textarea>
+      <div class="row">
+        <button onclick="convertText('upper')">UPPER</button>
+        <button onclick="convertText('lower')">lower</button>
+        <button onclick="convertText('title')">Title</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔐 Base64 Encode/Decode</h2>
+      <textarea id="baseInput" rows="3" placeholder="Teks..."></textarea>
+      <div class="row">
+        <button onclick="base64('encode')">Encode</button>
+        <button onclick="base64('decode')">Decode</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🔑 Password Generator</h2>
+      <input type="number" id="passLength" value="16" min="4" max="32">
+      <button onclick="genPassword()">Generate Password</button>
+      <input type="text" id="passOutput" readonly>
+    </div>
+
+    <div class="card">
+      <h2>🗜️ Kompres Gambar</h2>
+      <input type="file" id="imgInput" accept="image/*">
+      <input type="range" id="qualityRange" min="10" max="90" value="60">
+      <label style="font-size:0.8rem;">Quality: <span id="qVal">60%</span></label>
+      <button onclick="compressImage()">Kompres Sekarang</button>
+      <img id="previewImg" class="preview-img">
+      <a id="downloadLink" style="display:none;"><button>Download Hasil</button></a>
+      <canvas id="canvas"></canvas>
+    </div>
+  </div>
+
+  <p class="footer">BimZTools v3.0 Backend | 2026 | Made with ❤️ by BimZ</p>
+</div>
+
+<script>
+// UDAH PAKE BACKEND VERCEL - ANTI CORS
+async function downloadMedia() {
+  let url = document.getElementById('urlInput').value.trim();
+  const format = document.getElementById('formatSelect').value;
+  const quality = document.getElementById('qualitySelect').value;
+  if(!url) return alert('Masukkan link dulu bro!');
+
+  if(url.includes('tiktok.com') && url.includes('?')) {
+    url = url.split('?')[0];
+  }
+
+  const btn = event.target;
+  btn.innerText = 'Loading...'; btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/download', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        url: url,
+        vCodec: format === 'mp4'? 'h264' : 'mp3',
+        vQuality: quality,
+        aFormat: 'mp3',
+        isAudioOnly: format === 'mp3'
+      })
+    });
+
+    const data = await res.json();
+    if(data.status === 'picker' && data.picker && data.picker.length > 0) {
+      window.open(data.picker[0].url, '_blank');
+    } else if(data.url) {
+      window.open(data.url, '_blank');
+    } else {
+      alert('Gagal bro. Video private/region lock/musim dewa.');
+    }
+  } catch(e) {
+    alert('Error backend: ' + e.message);
+    console.log(e);
+  }
+
+  btn.innerText = 'Download Sekarang';
+  btn.disabled = false;
+}
+
+function testSpeed() {
+  const result = document.getElementById('speedResult');
+  result.innerText = 'Testing...';
+  const start = Date.now();
+  fetch(`https://eu.httpbin.org/bytes/3000000?t=${start}`)
+ .then(() => {
+      const duration = (Date.now() - start) / 1000;
+      const speed = ((3*8)/duration).toFixed(2);
+      result.innerText = speed + ' Mbps';
+    }).catch(() => result.innerText = 'Gagal test');
+}
+
+function generateQR() {
+  const text = document.getElementById('qrInput').value.trim();
+  if(!text) return alert('Masukkan teks!');
+  document.getElementById('qrcode').innerHTML = '';
+  new QRCode(document.getElementById('qrcode'), {text, width: 180, height: 180});
+}
+
+function convertText(type) {
+  let text = document.getElementById('textInput').value;
+  if(type==='upper') text = text.toUpperCase();
+  if(type==='lower') text = text.toLowerCase();
+  if(type==='title') text = text.replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.substr(1).toLowerCase());
+  document.getElementById('textInput').value = text;
+}
+
+function base64(type) {
+  let text = document.getElementById('baseInput').value;
+  try {
+    text = type==='encode'? btoa(unescape(encodeURIComponent(text))) : decodeURIComponent(escape(atob(text)));
+    document.getElementById('baseInput').value = text;
+  } catch(e) {alert('Format Base64 salah!');}
+}
+
+function genPassword() {
+  const len = document.getElementById('passLength').value;
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+  let pass = '';
+  for(let i=0; i<len; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+  document.getElementById('passOutput').value = pass;
+}
+
+document.getElementById('qualityRange').oninput = e => document.getElementById('qVal').innerText = e.target.value + '%';
+function compressImage() {
+  const file = document.getElementById('imgInput').files[0];
+  const quality = document.getElementById('qualityRange').value / 100;
+  if(!file) return alert('Pilih gambar dulu!');
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.getElementById('canvas');
+    canvas.width = img.width; canvas.height = img.height;
+    canvas.getContext('2d').drawImage(img, 0, 0);
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      document.getElementById('previewImg').src = url;
+      document.getElementById('previewImg').style.display = 'block';
+      document.getElementById('downloadLink').href = url;
+      document.getElementById('downloadLink').download = 'bimztools_compressed.jpg';
+      document.getElementById('downloadLink').style.display = 'block';
+    }, 'image/jpeg', quality);
+  };
+  img.src = URL.createObjectURL(file);
+}
+</script>
+</body>
+</html>
