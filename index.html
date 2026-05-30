@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BimZ Hub - Semua Project Gue</title>
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif;}
+body {
+  background: #0a0a0f;
+  color: #e0e0e0;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.5) 0%, transparent 50%),
+              radial-gradient(circle at 70% 60%, rgba(236, 72, 153, 0.4) 0%, transparent 50%),
+              radial-gradient(circle at 50% 80%, rgba(16, 185, 129, 0.3) 0%, transparent 50%);
+  animation: bgMove 20s ease infinite;
+  z-index: -1;
+}
+@keyframes bgMove {
+ 0%, 100% {transform: scale(1) rotate(0deg);}
+ 50% {transform: scale(1.2) rotate(10deg);}
+}
+
+.container {max-width: 900px; margin: 0 auto; padding: 40px 20px; animation: fadeIn 1s;}
+@keyframes fadeIn {from {opacity: 0; transform: translateY(30px);} to {opacity: 1; transform: translateY(0);}}
+
+header {text-align: center; margin-bottom: 60px;}
+h1 {
+  font-size: clamp(2.5rem, 8vw, 4rem);
+  background: linear-gradient(90deg, #3b82f6, #ec4899, #10b981);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s ease infinite;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+@keyframes shimmer {0%, 100% {background-position: 0% 50%;} 50% {background-position: 100% 50%;}}
+
+.tagline {color: #888; font-size: 1.1rem; animation: fadeIn 1s 0.3s both;}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 25px;
+  margin-bottom: 60px;
+}
+
+.project-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 25px;
+  padding: 35px 25px;
+  text-align: center;
+  transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  text-decoration: none;
+  color: #e0e0e0;
+  display: block;
+  animation: cardUp 0.6s both;
+}
+.project-card:nth-child(1) {animation-delay: 0.1s;}
+.project-card:nth-child(2) {animation-delay: 0.2s;}
+.project-card:nth-child(3) {animation-delay: 0.3s;}
+
+@keyframes cardUp {
+  from {opacity: 0; transform: translateY(40px) scale(0.9);}
+  to {opacity: 1; transform: translateY(0) scale(1);}
+}
+
+.project-card:hover {
+  transform: translateY(-12px) scale(1.05);
+  border-color: rgba(96, 165, 250, 0.8);
+  box-shadow: 0 25px 50px rgba(96, 165, 250, 0.3);
+}
+
+.icon {
+  font-size: 3.5rem;
+  margin-bottom: 15px;
+  display: block;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {0%, 100% {transform: translateY(0);} 50% {transform: translateY(-8px);}}
+
+.project-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  background: linear-gradient(90deg, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.project-card p {
+  color: #aaa;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 30px;
+  background: linear-gradient(90deg, #3b82f6, #10b981);
+  background-size: 200% 200%;
+  border-radius: 12px;
+  font-weight: 600;
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  transition: 0.5s;
+}
+.project-card:hover .btn {
+  background-position: 100% 0;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+}
+.project-card:hover .btn::before {left: 100%;}
+
+footer {
+  text-align: center;
+  padding: 30px 0;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.social {
+  margin-top: 15px;
+}
+.social a {
+  color: #666;
+  margin: 0 10px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+.social a:hover {color: #60a5fa;}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>BimZ Hub</h1>
+    <p class="tagline">Semua project & tools gue kumpul di sini 🔥</p>
+  </header>
+
+  <div class="grid">
+    <!-- BimZTools -->
+    <a href="/tools.html" class="project-card">
+      <span class="icon">🧰</span>
+      <h2>BimZTools</h2>
+      <p>Toolbox all-in-one: Download YT/TikTok/IG, Speedtest, QR Generator, Kompres Gambar, Base64, Password Generator</p>
+      <span class="btn">Buka Tools</span>
+    </a>
+
+    <!-- WebBug -->
+    <a href="/webbug.html" class="project-card">
+      <span class="icon">🐛</span>
+      <h2>WebBug</h2>
+      <p>Web buat ngetest & belajar bug. XSS, SQLi, CSRF sandbox. Edukasi doang bro, jangan disalahgunakan</p>
+      <span class="btn">Masuk Lab</span>
+    </a>
+
+    <!-- Project 3 - Bisa lo tambahin sendiri -->
+    <a href="#" class="project-card">
+      <span class="icon">⚡</span>
+      <h2>Project Baru</h2>
+      <p>Coming soon... Ada ide project apa? DM gue di IG</p>
+      <span class="btn">Segera Hadir</span>
+    </a>
+  </div>
+
+  <footer>
+    <p>BimZ Hub v1.0 | 2026 | Made with ❤️ + Kopi</p>
+    <div class="social">
+      <a href="#">GitHub</a>
+      <a href="#">Instagram</a>
+      <a href="#">Telegram</a>
+    </div>
+  </footer>
+</div>
+</body>
+</html>
