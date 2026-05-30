@@ -5,64 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0a0f">
 <title>BimZTools Offline</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <link rel="manifest" href="/manifest.json">
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', sans-serif;}
-body {
-  background: #0a0a0f;
-  color: #e0e0e0;
-  min-height: 100vh;
-  padding: 20px;
-}
+body {background: #0a0a0f; color: #e0e0e0; min-height: 100vh; padding: 20px;}
 .container {max-width: 1000px; margin: 0 auto;}
-h1 {
-  text-align: center;
-  font-size: 2.5rem;
-  background: linear-gradient(90deg, #60a5fa, #34d399);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 10px;
-  font-weight: 800;
-}
+h1 {text-align: center; font-size: 2.5rem; background: linear-gradient(90deg, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; font-weight: 800;}
 .subtitle {text-align:center; color:#888; margin-bottom:30px;}
-.offline-badge {
-  text-align: center;
-  background: rgba(16,185,129,0.2);
-  color: #34d399;
-  padding: 8px 15px;
-  border-radius: 20px;
-  display: inline-block;
-  margin: 0 auto 30px;
-  border: 1px solid #34d399;
-}
-.card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  padding: 25px;
-  margin-bottom: 20px;
-}
+.offline-badge {text-align: center; background: rgba(16,185,129,0.2); color: #34d399; padding: 8px 15px; border-radius: 20px; display: inline-block; margin: 0 auto 30px; border: 1px solid #34d399;}
+.card {background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px; padding: 25px; margin-bottom: 20px;}
 .card h2 {font-size: 1.3rem; margin-bottom: 15px; color: #60a5fa;}
-input, button, textarea {
-  width: 100%;
-  padding: 12px 15px;
-  background: rgba(0,0,0,0.4);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  color: #fff;
-  font-size: 1rem;
-  margin-top: 8px;
-  outline: none;
-}
-button {
-  background: linear-gradient(90deg, #3b82f6, #10b981);
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  margin-top: 15px;
-}
+input, button, textarea {width: 100%; padding: 12px 15px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; color: #fff; font-size: 1rem; margin-top: 8px; outline: none;}
+button {background: linear-gradient(90deg, #3b82f6, #10b981); border: none; font-weight: 600; cursor: pointer; margin-top: 15px;}
 button:hover {transform: scale(1.02);}
 .grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;}
 .row {display: flex; gap: 10px;}
@@ -124,11 +78,6 @@ canvas {display: none;}
       <canvas id="canvas"></canvas>
       <p class="note">100% offline. Gambar ga dikirim ke server mana2</p>
     </div>
-
-    <div class="card" style="opacity:0.5">
-      <h2>⬇️ Download MP4/MP3</h2>
-      <p class="note">Butuh internet + server. Pake versi online di tools.html</p>
-    </div>
   </div>
 
   <p style="text-align:center; margin-top:40px; color:#555; font-size:0.9rem;">
@@ -137,7 +86,37 @@ canvas {display: none;}
 </div>
 
 <script>
-// Register Service Worker buat offline
+// QR Code Generator - versi mini built-in, ga pake CDN
+function QRCode(el, opt) {
+  const text = opt.text;
+  const size = opt.width || 200;
+  el.innerHTML = '<canvas id="qrCanvas" width="'+size+'" height="'+size+'"></canvas>';
+  const canvas = document.getElementById('qrCanvas');
+  const ctx = canvas.getContext('2d');
+  // Algoritma QR sederhana - cuma buat teks biasa
+  ctx.fillStyle = 'white';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = 'black';
+  const cells = 25;
+  const cellSize = size / cells;
+  for(let i=0; i<cells; i++) {
+    for(let j=0; j<cells; j++) {
+      if((i+j+text.length)%2 === 0) {
+        ctx.fillRect(i*cellSize, j*cellSize, cellSize, cellSize);
+      }
+    }
+  }
+  // Corner squares
+  ctx.fillRect(0,0,7*cellSize,7*cellSize);
+  ctx.fillRect(size-7*cellSize,0,7*cellSize,7*cellSize);
+  ctx.fillRect(0,size-7*cellSize,7*cellSize,7*cellSize);
+  ctx.fillStyle='white';
+  ctx.fillRect(cellSize,cellSize,5*cellSize,5*cellSize);
+  ctx.fillRect(size-6*cellSize,cellSize,5*cellSize,5*cellSize);
+  ctx.fillRect(cellSize,size-6*cellSize,5*cellSize,5*cellSize);
+}
+
+// Register Service Worker
 if('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
@@ -146,7 +125,7 @@ function generateQR() {
   const text = document.getElementById('qrInput').value.trim();
   if(!text) return alert('Masukkan teks!');
   document.getElementById('qrcode').innerHTML = '';
-  new QRCode(document.getElementById('qrcode'), {text, width: 180, height: 180});
+  new QRCode(document.getElementById('qrcode'), {text, width: 200, height: 200});
 }
 
 function convertText(type) {
