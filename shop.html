@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop - BmzxzExe</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@600;800&display=swap');
+  
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #0a0a0a;
+    color: #fff;
+    padding-top: 80px;
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; width: 100%;
+    padding: 15px 40px;
+    background: rgba(10, 10, 10, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 0, 0, 0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .logo {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    background: linear-gradient(90deg, #ff0000, #ff4d4d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    cursor: pointer;
+  }
+
+  .cart-btn {
+    position: relative;
+    background: linear-gradient(90deg, #ff0000, #cc0000);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .cart-btn:hover { box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
+
+  .cart-count {
+    position: absolute;
+    top: -8px; right: -8px;
+    background: #ffaa00;
+    color: #000;
+    border-radius: 50%;
+    width: 22px; height: 22px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+    font-size: 2.5rem;
+    background: linear-gradient(90deg, #ff0000, #ff4d4d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 40px;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+  }
+
+  .product-card {
+    background: #1a1a1a;
+    border: 1px solid #330000;
+    border-radius: 16px;
+    padding: 20px;
+    transition: 0.3s;
+  }
+
+  .product-card:hover {
+    border-color: #ff0000;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
+    transform: translateY(-5px);
+  }
+
+  .product-card h3 { color: #ff4d4d; margin-bottom: 10px; }
+  .product-card p { color: #aaa; margin-bottom: 15px; font-size: 0.95rem; }
+  .price { font-family: 'Orbitron', sans-serif; color: #ff4d4d; font-size: 1.4rem; margin-bottom: 15px; }
+
+  .btn-add {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, #ff0000, #cc0000);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .btn-add:hover { box-shadow: 0 0 20px rgba(255, 0, 0, 0.6); }
+
+  /* Modal Cart */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-content {
+    background: #1a1a1a;
+    padding: 30px;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid #ff0000;
+    box-shadow: 0 0 40px rgba(255, 0, 0, 0.5);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal-content h3 { color: #ff4d4d; margin-bottom: 20px; }
+  
+  .cart-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #330000;
+  }
+
+  .cart-item button {
+    background: #880000;
+    border: none;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .total {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    color: #ff4d4d;
+    text-align: right;
+    margin: 20px 0;
+  }
+
+  .btn-checkout {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, #ff0000, #cc0000);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .close {
+    float: right;
+    cursor: pointer;
+    font-size: 28px;
+    color: #ff4d4d;
+  }
+
+  input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: #0d0d0d;
+    border: 1px solid #333;
+    border-radius: 8px;
+    color: #fff;
+    outline: none;
+  }
+
+  input:focus { border-color: #ff0000; }
+
+  @media (max-width: 600px) {
+    nav { padding: 15px 20px; }
+    h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo" onclick="window.location.href='index.html'">BMZXZ SHOP</div>
+  <button class="cart-btn" onclick="openCart()">
+    🛒 Keranjang
+    <span class="cart-count" id="cartCount">0</span>
+  </button>
+</nav>
+
+<div class="container">
+  <h1>Produk Tersedia</h1>
+  
+  <div class="product-grid" id="productGrid">
+    <!-- Produk di-generate pakai JS -->
+  </div>
+</div>
+
+<!-- Modal Cart -->
+<div class="modal" id="cartModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeCart()">&times;</span>
+    <h3>🛒 Keranjang Belanja</h3>
+    <div id="cartItems"></div>
+    <div class="total" id="cartTotal">Total: Rp 0</div>
+    
+    <input type="text" id="customerName" placeholder="Nama Kamu">
+    <input type="text" id="customerWA" placeholder="Nomor WA 08xxxxxxxxxx">
+    
+    <button class="btn-checkout" onclick="checkout()">Checkout via WhatsApp</button>
+  </div>
+</div>
+
+<script>
+const PRODUCTS = [
+  { id: 1, name: "Template Web Merah Hitam", price: 50000, desc: "Template landing page full responsive, cocok buat portofolio." },
+  { id: 2, name: "Script Auto WA Sender", price: 75000, desc: "Script kirim pesan WA massal via Google Apps Script." },
+  { id: 3, name: "Design Logo Gaming", price: 100000, desc: "Logo style gaming cyberpunk, file PSD + PNG." },
+  { id: 4, name: "Jasa Bikin Web", price: 250000, desc: "Bikin web statis 3-5 halaman sesuai request." }
+];
+
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+// Render produk
+function renderProducts() {
+  const grid = document.getElementById('productGrid');
+  grid.innerHTML = PRODUCTS.map(p => `
+    <div class="product-card">
+      <h3>${p.name}</h3>
+      <p>${p.desc}</p>
+      <div class="price">Rp ${p.price.toLocaleString('id-ID')}</div>
+      <button class="btn-add" onclick="addToCart(${p.id})">Tambah ke Keranjang</button>
+    </div>
+  `).join('');
+}
+
+// Tambah ke keranjang
+function addToCart(id) {
+  const product = PRODUCTS.find(p => p.id === id);
+  const existing = cart.find(item => item.id === id);
+  
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({ ...product, qty: 1 });
+  }
+  
+  saveCart();
+  updateCartCount();
+  alert(`${product.name} ditambah ke keranjang!`);
+}
+
+// Update jumlah di icon keranjang
+function updateCartCount() {
+  const total = cart.reduce((sum, item) => sum + item.qty, 0);
+  document.getElementById('cartCount').textContent = total;
+}
+
+// Buka modal keranjang
+function openCart() {
+  document.getElementById('cartModal').style.display = 'flex';
+  renderCart();
+}
+
+function closeCart() {
+  document.getElementById('cartModal').style.display = 'none';
+}
+
+// Render isi keranjang
+function renderCart() {
+  const cartItems = document.getElementById('cartItems');
+  
+  if (cart.length === 0) {
+    cartItems.innerHTML = '<p style="color:#aaa; text-align:center;">Keranjang kosong</p>';
+    document.getElementById('cartTotal').textContent = 'Total: Rp 0';
+    return;
+  }
+  
+  cartItems.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div>
+        <strong>${item.name}</strong><br>
+        <small>Rp ${item.price.toLocaleString('id-ID')} x ${item.qty}</small>
+      </div>
+      <div>
+        <strong>Rp ${(item.price * item.qty).toLocaleString('id-ID')}</strong>
+        <button onclick="removeFromCart(${item.id})">X</button>
+      </div>
+    </div>
+  `).join('');
+  
+  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+  document.getElementById('cartTotal').textContent = `Total: Rp ${total.toLocaleString('id-ID')}`;
+}
+
+// Hapus item
+function removeFromCart(id) {
+  cart = cart.filter(item => item.id !== id);
+  saveCart();
+  updateCartCount();
+  renderCart();
+}
+
+// Simpan ke localStorage
+function saveCart() {
+  localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+// Checkout - kirim ke Apps Script
+async function checkout() {
+  const name = document.getElementById('customerName').value.trim();
+  const wa = document.getElementById('customerWA').value.trim();
+  
+  if (!name || !wa) {
+    alert('Isi nama dan nomor WA dulu!');
+    return;
+  }
+  
+  if (!/^\d{10,13}$/.test(wa)) {
+    alert('Nomor WA harus 10-13 digit angka!');
+    return;
+  }
+  
+  if (cart.length === 0) {
+    alert('Keranjang masih kosong!');
+    return;
+  }
+  
+  const orderData = {
+    name: name,
+    whatsapp: wa,
+    items: cart,
+    total: cart.reduce((sum, item) => sum + item.price * item.qty, 0),
+    time: new Date().toLocaleString('id-ID')
+  };
+  
+  try {
+    // Kirim ke Apps Script lo
+    await fetch('https://script.google.com/macros/s/AKfycbwiMlUFNfrE90ySR_wms7fd44OpZ9VYtt0yB7TmKuqyI_cpS0Jw9d16ZxufD3ShoKQK/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify(orderData)
+    });
+    
+    alert('Pesanan berhasil dikirim! Cek Telegram admin ya.');
+    cart = [];
+    saveCart();
+    updateCartCount();
+    closeCart();
+    
+  } catch (err) {
+    alert('Gagal kirim pesanan: ' + err.message);
+  }
+}
+
+// Init
+renderProducts();
+updateCartCount();
+
+// Tutup modal kalau klik luar
+window.onclick = (e) => {
+  if (e.target.id === 'cartModal') closeCart();
+};
+</script>
+
+</body>
+</html>

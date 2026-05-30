@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - BmzxzExe</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@600;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #0a0a0a;
+    color: #fff;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; }
+
+  h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #ff0000, #ff4d4d);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle { text-align: center; color: #aaa; margin-bottom: 30px; }
+
+  .controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    padding: 12px 24px;
+    background: linear-gradient(90deg, #ff0000, #cc0000);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  button:hover {
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+    transform: translateY(-2px);
+  }
+
+  button.danger {
+    background: linear-gradient(90deg, #ff0000, #880000);
+  }
+
+  .table-wrapper {
+    background: #1a1a1a;
+    border: 1px solid #330000;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.2);
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th {
+    background: #220000;
+    color: #ff4d4d;
+    padding: 15px;
+    text-align: left;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    border-bottom: 2px solid #ff0000;
+  }
+
+  td {
+    padding: 15px;
+    border-bottom: 1px solid #330000;
+    color: #ddd;
+  }
+
+  tr:hover { background: #220000; }
+  tr:last-child td { border-bottom: none; }
+
+  .status {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+  }
+
+  .status.proses {
+    background: #ffaa00;
+    color: #000;
+    box-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+  }
+
+  .status.tembus {
+    background: #00ff88;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  }
+
+  .loading { text-align: center; padding: 40px; color: #ff4d4d; }
+  .error { text-align: center; padding: 40px; color: #ff4d4d; background: #220000; border-radius: 8px; }
+  .count { text-align: center; color: #ff4d4d; margin-bottom: 15px; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 1.8rem; }
+    th, td { padding: 10px; font-size: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>📋 Daftar Target</h1>
+  <p class="subtitle">Data nomor yang masuk ke Google Sheet</p>
+
+  <div class="controls">
+    <button onclick="loadData()">🔄 Refresh</button>
+    <button onclick="clearData()" class="danger">🗑 Clear All</button>
+    <button onclick="window.location.href='index.html'">← Kembali ke Home</button>
+  </div>
+
+  <div class="count" id="count"></div>
+
+  <div class="table-wrapper">
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>No</th>
+          <th>Waktu</th>
+          <th>Nomor WA</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr><td colspan="4" class="loading">Loading data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+async function loadData() {
+  const tableBody = document.getElementById('tableBody');
+  const countEl = document.getElementById('count');
+
+  tableBody.innerHTML = '<tr><td colspan="4" class="loading">Loading data...</td></tr>';
+
+  const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSQOFNaJpgoq0NUexqLAWcF5Y4AuBjnw7cOS5UVTb_gcBLWz3RU4r0Rkom3j2_opUNXcvSC-EEeZjO9/pub?gid=0&single=true&output=csv';
+
+  try {
+    const res = await fetch(sheetURL);
+    if (!res.ok) throw new Error('Gagal fetch');
+
+    const text = await res.text();
+    const lines = text.trim().split('\n').slice(1); // skip header
+
+    if (lines.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="4" class="loading">Belum ada data</td></tr>';
+      countEl.textContent = 'Total: 0 data';
+      return;
+    }
+
+    const now = new Date();
+    tableBody.innerHTML = '';
+    let validCount = 0;
+
+    lines.reverse().forEach((line, i) => {
+      const firstComma = line.indexOf(',');
+      if (firstComma === -1) return;
+
+      const timeStr = line.substring(0, firstComma).trim();
+      const number = line.substring(firstComma + 1).trim();
+
+      if (!timeStr || !number) return;
+
+      validCount++;
+
+      const rowTime = new Date(timeStr);
+      const diffMin = (now - rowTime) / 60000;
+      const status = diffMin < 1
+       ? '<span class="status proses">PROSES</span>'
+        : '<span class="status tembus">TEMBUS</span>';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${validCount}</td>
+        <td>${timeStr}</td>
+        <td>${number}</td>
+        <td>${status}</td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+    countEl.textContent = `Total: ${validCount} data`;
+
+  } catch (err) {
+    console.error(err);
+    tableBody.innerHTML = `<tr><td colspan="4" class="error">Gagal load data. Cek sheet udah di-publish ke CSV belum.</td></tr>`;
+    countEl.textContent = '';
+  }
+}
+
+async function clearData() {
+  if (!confirm('Yakin mau hapus SEMUA data? Ini gabisa di-undo!')) {
+    return;
+  }
+
+  try {
+    await fetch('https://script.google.com/macros/s/AKfycbziaBsqwmIBdgGxxUNV5_dFU-Pz1CZ_Ca5_dovZYVSqsL72xsfDAy8JSYU_xsrtxmdV/exec', {
+      method: 'DELETE',
+      mode: 'no-cors'
+    });
+
+    alert('Data berhasil dihapus!');
+    loadData();
+  } catch (err) {
+    alert('Gagal hapus data: ' + err.message);
+  }
+}
+
+loadData();
+setInterval(loadData, 10000);
+</script>
+
+</body>
+</html>
