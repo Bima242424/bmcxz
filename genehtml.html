@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Generator by Bro</title>
+<style>
+  body{font-family:Arial;background:#0f172a;color:#fff;padding:20px}
+ .box{max-width:600px;margin:auto;background:#1e293b;padding:25px;border-radius:15px}
+  h1{text-align:center;color:#38bdf8}
+  input,select,button{width:100%;padding:12px;margin:8px 0;border-radius:8px;border:none;font-size:16px}
+  input,select{background:#334155;color:#fff}
+  button{background:#22c55e;color:#fff;font-weight:bold;cursor:pointer}
+  button:hover{background:#16a34a}
+ .preview{margin-top:20px;padding:15px;background:#0b1120;border-radius:10px;font-size:13px;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>🔧 Web Generator</h1>
+
+  <label>Nama Web/Orang:</label>
+  <input type="text" id="nama" placeholder="Contoh: Meong, BimZTools, Toko Bro">
+
+  <label>Pilih Template:</label>
+  <select id="template">
+    <option value="bug">Template Bug Gombal - buat ngetroll</option>
+    <option value="marketplace">Template Marketplace Mini</option>
+    <option value="biodata">Template Biodata Keren</option>
+    <option value="ucapan">Template Ucapan Ultah</option>
+  </select>
+
+  <button onclick="generate()">Generate Web!</button>
+
+  <div id="hasil"></div>
+</div>
+
+<script>
+const templates = {
+  bug: `<!DOCTYPE html><html><head><title>{NAMA}</title><style>body{background:pink;text-align:center;padding:50px;font-family:Arial}button{padding:15px 30px;font-size:20px;background:red;color:white;border:none;border-radius:10px;position:absolute}button:hover{transform:translate(50px,50px)}</style></head><body><h1>{NAMA} mau jadi pacar gue ga? 😳</h1><button onmouseover="this.style.left=Math.random()*300+'px';this.style.top=Math.random()*300+'px'">Engga</button><button onclick="alert('{NAMA} pasti mau kan 🥰')">Mau</button></body></html>`,
+
+  marketplace: `<!DOCTYPE html><html><head><title>{NAMA} Store</title><style>body{font-family:Arial;background:#f3f4f6;padding:20px}.produk{background:white;padding:15px;margin:10px;border-radius:10px;box-shadow:0 2px 5px #ccc}</style></head><body><h1>🛒 Selamat Datang di {NAMA}</h1><div class="produk"><h3>Produk 1</h3><p>Harga: Rp50.000</p><button>Beli</button></div><div class="produk"><h3>Produk 2</h3><p>Harga: Rp75.000</p><button>Beli</button></div><p>Footer: {NAMA} - Toko Terpercaya</p></body></html>`,
+
+  biodata: `<!DOCTYPE html><html><head><title>Biodata {NAMA}</title><style>body{background:linear-gradient(135deg,#667eea,#764ba2);color:white;text-align:center;padding:50px;font-family:Arial}.card{background:rgba(255,255,255,0.2);padding:30px;border-radius:20px;max-width:400px;margin:auto}</style></head><body><div class="card"><h1>Halo, Gue {NAMA} 👋</h1><p>Umur: 18 tahun<br>Hobi: Ngoding + Rebahan<br>Cita2: Jadi sultan</p></div></body></html>`,
+
+  ucapan: `<!DOCTYPE html><html><head><title>Selamat Ultah {NAMA}</title><style>body{background:#ffe4e1;text-align:center;padding:50px;font-family:Arial}h1{color:#e11d48;font-size:40px}</style></head><body><h1>🎉 Happy Birthday {NAMA}! 🎂</h1><p>Semoga panjang umur, sehat selalu, cepet kaya ya {NAMA} 🥳</p><p>- Dari temen setia</p></body></html>`
+};
+
+function generate(){
+  const nama = document.getElementById('nama').value.trim();
+  const template = document.getElementById('template').value;
+
+  if(!nama){
+    alert('Isi nama dulu bro!');
+    return;
+  }
+
+  // Ganti {NAMA} jadi nama yg diinput
+  let kode = templates[template].replaceAll('{NAMA}', nama);
+
+  // Bikin nama file otomatis: nama-template.html
+  const namaFile = nama.toLowerCase().replace(/\s+/g, '-') + '-' + template + '.html';
+
+  // Tampil preview + tombol download
+  document.getElementById('hasil').innerHTML = `
+    <h3>Jadi nih web nya:</h3>
+    <p>Nama file: <b>${namaFile}</b></p>
+    <button onclick="download('${namaFile}', \`${kode.replace(/`/g,'\\`')}\`)">📥 Download HTML</button>
+    <div class="preview">${kode.substring(0,300)}...</div>
+  `;
+}
+
+function download(namaFile, kode){
+  const blob = new Blob([kode], {type: 'text/html'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = namaFile;
+  link.click();
+}
+</script>
+</body>
+</html>
